@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Lan Hương 💗</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#35133e}
+body{font-family:"Segoe UI",Arial,sans-serif}
+.scene{
+  position:fixed;inset:0;
+  opacity:0;visibility:hidden;
+  transition:opacity 1s ease,transform 1s ease;
+  transform:scale(1.025);
+  background:#35133e;
+}
+.scene.active{
+  opacity:1;visibility:visible;transform:scale(1);
+  z-index:10;
+}
+.art{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  background-position:center;
+  background-repeat:no-repeat;
+  background-size:100% 100%;
+}
+.scene.active .art{
+  animation:slowZoom 8s ease-in-out both;
+}
+@keyframes slowZoom{
+  from{transform:scale(1)}
+  to{transform:scale(1.018)}
+}
+
+/* Exact reference-art backgrounds */
+.s1 .art{background-image:url("01_starry.jpg")}
+.s2 .art{background-image:url("02_cover.jpg")}
+.s3 .art{background-image:url("03_photo_reveal.jpg")}
+.s4 .art{background-image:url("04_open_letter.jpg")}
+.s5 .art{background-image:url("05_memory.jpg")}
+.s6 .art{background-image:url("06_final.jpg")}
+
+/* Real interaction layer */
+.hotspot{
+  position:absolute;
+  border:0;background:transparent;cursor:pointer;
+}
+.hotspot:focus-visible{
+  outline:3px solid #fff;
+  box-shadow:0 0 20px #fff;
+  border-radius:50px;
+}
+
+/* scene 1 */
+.start{
+  left:50%;bottom:8%;
+  transform:translateX(-50%);
+  width:260px;height:70px;
+}
+
+/* scene 2 button area */
+.open{
+  left:50%;top:77%;
+  transform:translate(-50%,-50%);
+  width:min(280px,32vw);height:75px;
+}
+
+/* scene 3: animated light sweep over the reference artwork */
+.s3glow{
+  position:absolute;inset:-20%;
+  pointer-events:none;
+  background:linear-gradient(
+    105deg,transparent 35%,
+    rgba(255,255,255,.20) 49%,
+    rgba(255,170,220,.16) 52%,
+    transparent 65%
+  );
+  transform:translateX(-80%);
+  animation:sweep 4.2s ease-in-out infinite;
+  mix-blend-mode:screen;
+}
+@keyframes sweep{
+  0%,20%{transform:translateX(-90%)}
+  65%,100%{transform:translateX(90%)}
+}
+
+/* floating petals/hearts */
+.particle{
+  position:absolute;
+  z-index:5;
+  pointer-events:none;
+  opacity:0;
+  animation:float 4.8s linear infinite;
+}
+@keyframes float{
+  0%{opacity:0;transform:translateY(20px) rotate(0)}
+  15%{opacity:.9}
+  100%{opacity:0;transform:translateY(-110vh) rotate(360deg)}
+}
+
+/* scene 4 & 5 real navigation */
+.continue{
+  position:absolute;
+  z-index:20;
+  left:50%;bottom:5%;
+  transform:translateX(-50%);
+  width:270px;height:65px;
+  border:0;border-radius:999px;
+  background:rgba(255,74,139,.18);
+  box-shadow:0 0 0 2px rgba(255,255,255,.18),0 8px 30px rgba(83,17,70,.35);
+  backdrop-filter:blur(6px);
+  cursor:pointer;
+}
+.continue:after{
+  content:"";
+  position:absolute;inset:0;border-radius:999px;
+  animation:pulse 1.7s infinite;
+}
+@keyframes pulse{
+  50%{box-shadow:0 0 30px rgba(255,104,175,.55)}
+}
+
+/* hidden accessible text */
+.sr{
+  position:absolute;width:1px;height:1px;overflow:hidden;
+  clip:rect(0,0,0,0);
+}
+</style>
+</head>
+<body>
+
+<section class="scene s1 active" id="scene1">
+  <div class="art"></div>
+  <button class="hotspot start" onclick="go(2)" aria-label="Bắt đầu">
+    <span class="sr">Bắt đầu</span>
+  </button>
+</section>
+
+<section class="scene s2" id="scene2">
+  <div class="art"></div>
+  <button class="hotspot open" onclick="openCard()" aria-label="Mở thiệp">
+    <span class="sr">Mở thiệp</span>
+  </button>
+</section>
+
+<section class="scene s3" id="scene3">
+  <div class="art"></div>
+  <div class="s3glow"></div>
+  <button class="hotspot continue" onclick="go(4)" aria-label="Xem lời chúc">
+    <span class="sr">Xem lời chúc</span>
+  </button>
+</section>
+
+<section class="scene s4" id="scene4">
+  <div class="art"></div>
+  <button class="hotspot continue" onclick="go(5)" aria-label="Xem tiếp">
+    <span class="sr">Xem tiếp</span>
+  </button>
+</section>
+
+<section class="scene s5" id="scene5">
+  <div class="art"></div>
+  <button class="hotspot continue" onclick="go(6)" aria-label="Lời chúc cuối">
+    <span class="sr">Lời chúc cuối</span>
+  </button>
+</section>
+
+<section class="scene s6" id="scene6">
+  <div class="art"></div>
+</section>
+
+<script>
+const scenes=[...document.querySelectorAll(".scene")];
+let current=1;
+
+function go(n){
+  current=n;
+  scenes.forEach((s,i)=>s.classList.toggle("active",i===n-1));
+}
+
+function openCard(){
+  go(3);
+
+  // Photo scene stays for 5.5 seconds, then the user can continue.
+  setTimeout(()=>{
+    document.getElementById("scene3").classList.add("ready");
+  },5500);
+}
+
+/* Keyboard navigation */
+document.addEventListener("keydown",(e)=>{
+  if(e.key==="ArrowRight" && current<6) go(current+1);
+  if(e.key==="ArrowLeft" && current>1) go(current-1);
+});
+</script>
+</body>
+</html>
